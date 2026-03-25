@@ -12,145 +12,157 @@ import "C"
 import (
 	"unsafe"
 )
+
 // OpenGL ES 常量
 const (
 	// 着色器类型
 	VERTEX_SHADER   = 0x8B31
 	FRAGMENT_SHADER = 0x8B30
-	
+
 	// 缓冲对象
-	ARRAY_BUFFER        = 0x8892
+	ARRAY_BUFFER         = 0x8892
 	ELEMENT_ARRAY_BUFFER = 0x8893
-	STATIC_DRAW         = 0x88E4
-	DYNAMIC_DRAW        = 0x88E8
-	
+	STATIC_DRAW          = 0x88E4
+	DYNAMIC_DRAW         = 0x88E8
+
 	// 数据类型
 	FLOAT          = 0x1406
 	UNSIGNED_BYTE  = 0x1401
 	UNSIGNED_INT   = 0x1405
 	UNSIGNED_SHORT = 0x1403
-	
-	// 纹理参数
-	TEXTURE0       = 0x84C0
-	TEXTURE1       = 0x84C1
-	TEXTURE_2D      = 0x0DE1
-	TEXTURE_WRAP_S  = 0x2802
-	TEXTURE_WRAP_T  = 0x2803
-	TEXTURE_MIN_FILTER = 0x2801
-	TEXTURE_MAG_FILTER = 0x2800
-	CLAMP_TO_EDGE   = 0x812F
-	LINEAR          = 0x2601
-	LINEAR_MIPMAP_LINEAR = 0x2703
-	RGB            = 0x1907
-	RGBA            = 0x1908
-	
-	// 渲染状态
-	DEPTH_TEST      = 0x0B71
-	BLEND           = 0x0BE2
-	SRC_ALPHA       = 0x0302
-	ONE_MINUS_SRC_ALPHA = 0x0303
-	LESS            = 0x0201
-	LEQUAL          = 0x0203
-	FUNC_ADD        = 0x8006
-	COLOR_BUFFER_BIT  = 0x00004000
-	DEPTH_BUFFER_BIT  = 0x00000100
-	TRIANGLES       = 0x0004
 
-	FRAMEBUFFER     = 0x8D40
-	RENDERBUFFER    = 0x8D41
-	DEPTH_COMPONENT  = 0x1902
-	DEPTH_ATTACHMENT = 0x8D00
-	FRAMEBUFFER_COMPLETE = 0x8CD5
-	COLOR_ATTACHMENT0    =0x8CE0
-	DEPTH_COMPONENT16  = 0x81A5
-	FRAMEBUFFER_UNSUPPORTED   =   0x8CDD
-	FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8CD6
+	// 纹理参数
+	TEXTURE0             = 0x84C0
+	TEXTURE1             = 0x84C1
+	TEXTURE_2D           = 0x0DE1
+	TEXTURE_WRAP_S       = 0x2802
+	TEXTURE_WRAP_T       = 0x2803
+	TEXTURE_MIN_FILTER   = 0x2801
+	TEXTURE_MAG_FILTER   = 0x2800
+	CLAMP_TO_EDGE        = 0x812F
+	LINEAR               = 0x2601
+	LINEAR_MIPMAP_LINEAR = 0x2703
+	RGB                  = 0x1907
+	RGBA                 = 0x1908
+
+	// 渲染状态
+	DEPTH_TEST          = 0x0B71
+	BLEND               = 0x0BE2
+	CULL_FACE           = 0x0B44
+	SRC_ALPHA           = 0x0302
+	ONE_MINUS_SRC_ALPHA = 0x0303
+	LESS                = 0x0201
+	LEQUAL              = 0x0203
+	FUNC_ADD            = 0x8006
+	COLOR_BUFFER_BIT    = 0x00004000
+	DEPTH_BUFFER_BIT    = 0x00000100
+	TRIANGLES           = 0x0004
+
+	FRAMEBUFFER                               = 0x8D40
+	RENDERBUFFER                              = 0x8D41
+	DEPTH_COMPONENT                           = 0x1902
+	DEPTH_ATTACHMENT                          = 0x8D00
+	FRAMEBUFFER_COMPLETE                      = 0x8CD5
+	COLOR_ATTACHMENT0                         = 0x8CE0
+	DEPTH_COMPONENT16                         = 0x81A5
+	FRAMEBUFFER_UNSUPPORTED                   = 0x8CDD
+	FRAMEBUFFER_INCOMPLETE_ATTACHMENT         = 0x8CD6
 	FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7
-	FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 0x8CD9
-	RGBA16F = 0x881A
-	RGB16F   =    0x881B
-	
+	FRAMEBUFFER_INCOMPLETE_DIMENSIONS         = 0x8CD9
+	RGBA16F                                   = 0x881A
+	RGB16F                                    = 0x881B
+
 	// 着色器状态
 	COMPILE_STATUS  = 0x8B81
 	LINK_STATUS     = 0x8B82
 	INFO_LOG_LENGTH = 0x8B84
 )
+
 // 顶点缓冲对象相关
 func GenBuffers(n int32) uint32 {
-    var buffer uint32
-    C.glGenBuffers(C.GLsizei(n), (*C.GLuint)(&buffer))
-    return buffer
+	var buffer uint32
+	C.glGenBuffers(C.GLsizei(n), (*C.GLuint)(&buffer))
+	return buffer
 }
 
 func BindBuffer(target uint32, buffer uint32) {
-    C.glBindBuffer(C.GLenum(target), C.GLuint(buffer))
+	C.glBindBuffer(C.GLenum(target), C.GLuint(buffer))
+}
+
+func DeleteBuffers(buffer uint32) {
+	C.glDeleteBuffers(1, (*C.GLuint)(&buffer))
 }
 
 func BufferData(target uint32, data []float32, usage uint32) {
-    C.glBufferData(C.GLenum(target), C.GLsizeiptr(len(data)*4), unsafe.Pointer(&data[0]), C.GLenum(usage))
+	C.glBufferData(C.GLenum(target), C.GLsizeiptr(len(data)*4), unsafe.Pointer(&data[0]), C.GLenum(usage))
 }
 
 // 着色器相关
 func CreateShader(shaderType uint32) uint32 {
-    return uint32(C.glCreateShader(C.GLenum(shaderType)))
+	return uint32(C.glCreateShader(C.GLenum(shaderType)))
 }
 
 func ShaderSource(shader uint32, source string) {
-    csource := C.CString(source)
-    defer C.free(unsafe.Pointer(csource))
-    C.glShaderSource(C.GLuint(shader), 1, &csource, nil)
+	csource := C.CString(source)
+	defer C.free(unsafe.Pointer(csource))
+	C.glShaderSource(C.GLuint(shader), 1, &csource, nil)
 }
 
 func CompileShader(shader uint32) {
-    C.glCompileShader(C.GLuint(shader))
+	C.glCompileShader(C.GLuint(shader))
 }
 
 func CreateProgram() uint32 {
-    return uint32(C.glCreateProgram())
+	return uint32(C.glCreateProgram())
 }
 
 func AttachShader(program, shader uint32) {
-    C.glAttachShader(C.GLuint(program), C.GLuint(shader))
+	C.glAttachShader(C.GLuint(program), C.GLuint(shader))
 }
 
 func LinkProgram(program uint32) {
-    C.glLinkProgram(C.GLuint(program))
+	C.glLinkProgram(C.GLuint(program))
 }
 
 func UseProgram(program uint32) {
-    C.glUseProgram(C.GLuint(program))
+	C.glUseProgram(C.GLuint(program))
 }
 
 // 顶点数组对象
 func GenVertexArrays(n int32) uint32 {
-    var array uint32
-    C.glGenVertexArrays(C.GLsizei(n), (*C.GLuint)(&array))
-    return array
+	var array uint32
+	C.glGenVertexArrays(C.GLsizei(n), (*C.GLuint)(&array))
+	return array
 }
 
 func BindVertexArray(array uint32) {
-    C.glBindVertexArray(C.GLuint(array))
+	C.glBindVertexArray(C.GLuint(array))
+}
+
+func DeleteVertexArrays(array uint32) {
+	C.glDeleteVertexArrays(1, (*C.GLuint)(&array))
 }
 
 func VertexAttribPointer(index uint32, size int32, xtype uint32, normalized bool, stride int32, offset uintptr) {
-    norm := C.GLboolean(0)
-    if normalized {
-        norm = 1
-    }
-    C.glVertexAttribPointer(C.GLuint(index), C.GLint(size), C.GLenum(xtype), norm, C.GLsizei(stride), unsafe.Pointer(offset))
+	norm := C.GLboolean(0)
+	if normalized {
+		norm = 1
+	}
+	C.glVertexAttribPointer(C.GLuint(index), C.GLint(size), C.GLenum(xtype), norm, C.GLsizei(stride), unsafe.Pointer(offset))
 }
 
 func EnableVertexAttribArray(index uint32) {
-    C.glEnableVertexAttribArray(C.GLuint(index))
+	C.glEnableVertexAttribArray(C.GLuint(index))
 }
 
 // 绘制
 func DrawArrays(mode uint32, first, count int32) {
-    C.glDrawArrays(C.GLenum(mode), C.GLint(first), C.GLsizei(count))
+	C.glDrawArrays(C.GLenum(mode), C.GLint(first), C.GLsizei(count))
 }
 func GetError() uint32 {
 	return uint32(C.glGetError())
 }
+
 // 辅助函数：创建指针
 func Ptr(data interface{}) unsafe.Pointer {
 	switch v := data.(type) {
@@ -191,6 +203,7 @@ func DepthMask(flag bool) {
 	}
 	C.glDepthMask(mask)
 }
+
 // 新增：状态管理函数
 func Enable(cap uint32) {
 	C.glEnable(C.GLenum(cap))
@@ -203,11 +216,16 @@ func Disable(cap uint32) {
 func DepthFunc(fn uint32) {
 	C.glDepthFunc(C.GLenum(fn))
 }
+
 // 新增：纹理相关函数
 func GenTextures(n int32) uint32 {
 	var texture uint32
 	C.glGenTextures(C.GLsizei(n), (*C.GLuint)(&texture))
 	return texture
+}
+
+func DeleteTextures(texture uint32) {
+	C.glDeleteTextures(1, (*C.GLuint)(&texture))
 }
 
 func BindTexture(target uint32, texture uint32) {
@@ -218,10 +236,10 @@ func TexParameteri(target, pname uint32, param int32) {
 	C.glTexParameteri(C.GLenum(target), C.GLenum(pname), C.GLint(param))
 }
 
-func TexImage2D(target uint32, level int32, internalFormat uint32, width, height int32, 
+func TexImage2D(target uint32, level int32, internalFormat uint32, width, height int32,
 	border int32, format, xtype uint32, data unsafe.Pointer) {
-	C.glTexImage2D(C.GLenum(target), C.GLint(level), C.GLint(internalFormat), 
-		C.GLsizei(width), C.GLsizei(height), C.GLint(border), 
+	C.glTexImage2D(C.GLenum(target), C.GLint(level), C.GLint(internalFormat),
+		C.GLsizei(width), C.GLsizei(height), C.GLint(border),
 		C.GLenum(format), C.GLenum(xtype), data)
 }
 
