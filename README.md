@@ -46,11 +46,12 @@ go get github.com/tthhr/go-drm-egl
 ```
 
 ### Run Examples
-The project currently includes three basic examples:
+The project currently includes four basic examples:
 
 * `examples/triangle_test`: renders a simple triangle.
 * `examples/texture_test`: creates, displays, and deletes a texture.
 * `examples/model_test`: loads and displays the `car.glb` model.
+* `examples/cimgui_test`: integrates `cimgui-go` on top of DRM/EGL.
 
 Triangle example:
 
@@ -73,14 +74,21 @@ cd examples/model_test
 go run main.go
 ```
 
+cimgui-go example:
+
+```bash
+cd examples/cimgui_test
+go run .
+```
+
 Run these examples in a local TTY session rather than over SSH or a remote desktop session.
 
 ## Screenshots
 > Note: the screenshots below were captured in a PC virtual machine.
 
-| Triangle Test | Model Test |
-| :---: | :---: |
-| ![Triangle](./examples/triangle_test/triangle.jpg) | ![Model](./examples/model_test/model.jpg) |
+| Triangle Test | Model Test | cimgui-go Test |
+| :---: | :---: | :---: |
+| ![Triangle](./examples/triangle_test/triangle.jpg) | ![Model](./examples/model_test/model.jpg) | ![cimgui-go](./examples/cimgui_test/cimgui-go.jpg) |
 
 ## Project Structure
 * `/drm`: core CGO logic for DRM initialization, GBM buffer management, and EGL context creation.
