@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libdrm-dev \
+            libgbm-dev \
+            libegl1-mesa-dev \
+            libgles2-mesa-dev \
+            pkg-config
+
+      - name: Verify all packages build
+        run: go build ./...
+
+  texture-test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libdrm-dev \
+            libgbm-dev \
+            libegl1-mesa-dev \
+            libgles2-mesa-dev \
+            pkg-config
+
+      - name: Check DRM device availability
+        id: drm
+        run: |
+          if [ -e /dev/dri/card0 ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No /dev/dri/card0 on this runner; skipping texture_test runtime check."
+          fi
+
+      - name: Run texture_test
+        if: steps.drm.outputs.available == 'true'
+        run: timeout 10s go run ./examples/texture_test
+
+      - name: Report skipped runtime check
+        if: steps.drm.outputs.available != 'true'
+        run: |
+          echo "texture_test requires a DRM/KMS device and cannot run on a standard GitHub-hosted runner."
+          echo "Use a self-hosted Linux runner with /dev/dri/card0 if you need this step to execute in CI."
