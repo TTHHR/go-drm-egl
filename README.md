@@ -79,13 +79,21 @@ Run these examples in a local TTY session rather than over SSH or a remote deskt
 ## Screenshots
 > Note: the screenshots below were captured in a PC virtual machine.
 
-| Triangle Test | Model Test | cimgui-go Test |
+| Triangle Test | Model Test |
 | :---: | :---: | :---: |
-| ![Triangle](./examples/triangle_test/triangle.jpg) | ![Model](./examples/model_test/model.jpg) | ![cimgui-go](./examples/cimgui_test/cimgui-go.jpg) |
+| ![Triangle](./examples/triangle_test/triangle.jpg) | ![Model](./examples/model_test/model.jpg) |
 
 ## Project Structure
 * `/drm`: core CGO logic for DRM initialization, GBM buffer management, and EGL context creation.
 * `/examples`: sample programs showing initialization and rendering loops.
+
+## Changelog
+### latest
+- 在 `drm/csrc/drm_egl.c` 中添加 GBM 格式支持检测：
+  - 初始化时判断 `gbm_device_is_format_supported(ctx->gbm_dev, gbm_format, gbm_flags)`。
+  - 失败时打印错误信息，调用 `drm_egl_cleanup` 并返回 `NULL`。
+- 将 `drm_egl_render_frame` 中 `gbm_surface_lock_front_buffer` 失败路径从仅打印改为 `exit(1)`，以避免后续空指针访问。
+- 新增 `buildArm64.sh` 和 `examples/imgui_test/`
 
 ## Cross Compilation
 Example for `arm64`:

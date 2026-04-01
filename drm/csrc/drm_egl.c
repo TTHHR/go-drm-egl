@@ -273,9 +273,15 @@ DRMEGLContext* drm_egl_init(int width, int height) {
         gbm_flags |= GBM_BO_USE_SCANOUT;
     }
 
-    uint32_t gbm_format = GBM_FORMAT_XRGB8888;
+    uint32_t gbm_format = GBM_FORMAT_XRGB8888; 
     if (native_visual != 0) {
         gbm_format = (uint32_t)native_visual;
+    }
+
+    if (!gbm_device_is_format_supported(ctx->gbm_dev, gbm_format, gbm_flags)) {
+        fprintf(stderr, "GBM format ARGB8888 not supported.\n");
+        drm_egl_cleanup(ctx);
+        return NULL;
     }
 
     ctx->gbm_surf = gbm_surface_create(ctx->gbm_dev, surface_width, surface_height, gbm_format, gbm_flags);
@@ -325,7 +331,7 @@ void drm_egl_render_frame(DRMEGLContext* ctx) {
     ctx->next_bo = gbm_surface_lock_front_buffer(ctx->gbm_surf);
     if (!ctx->next_bo) {
         fprintf(stderr, "Failed to lock front buffer.\n");
-        return;
+        exit(1);
     }
 
     uint32_t handle = gbm_bo_get_handle(ctx->next_bo).u32;
